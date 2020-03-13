@@ -1,0 +1,22 @@
+{
+    "name": "esb-root",
+    "version": "1.0.0",
+    "description": "ESB que contiene las reglas de negocio de la casa Matriz y alimenta las sedes",
+    "main": "esb.js",
+    "dependencies": {
+        "http": "0.0.0",
+        "readline-sync": "^1.4.10",
+        "redis": "^3.0.2",
+        "xmlhttprequest": "^1.8.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/daniiel-morales/esb-root.git"
+    },
+    "author": "danii_mor",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/daniiel-morales/Tarea5/issues"
+    },
+    "homepage": "https://github.com/daniiel-morales/Tarea5#readme"
+}
