@@ -6,7 +6,7 @@
     "dependencies": {
         "http": "0.0.0",
         "readline-sync": "^1.4.10",
-        "redis": "^3.0.2",
+        "redis-smq": "^1.1.6",
         "xmlhttprequest": "^1.8.0"
     },
     "repository": {
