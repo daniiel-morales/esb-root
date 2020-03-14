@@ -6,13 +6,31 @@
 **************************/
 
 // Modules required
-const redis = require('redis')
+
+const config = require('./config')
+const { Producer } = require('redis-smq')
 
 // Service parameters
-const host = '127.0.0.1'
-const port = '6379'
-const queque = redis.createClient(port, host)
+const producer = new Producer('esb_queue', config)
 
-queque.on('connect', function () {
-  console.log('connected')
-})
+var Queque = /* @class */(function () {
+  function Queque () {
+
+  }
+  Queque.prototype.ADD = function (msg) {
+    return producer.produceMessage(msg, (err) => {
+      if (err) {
+        return false
+      } else {
+        return true
+      }
+    })
+  }
+
+  Queque.prototype.CLOSE = function () {
+    producer.shutdown()
+  }
+  return Queque
+}())
+
+exports.Queque = Queque
