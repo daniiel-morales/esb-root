@@ -41,7 +41,7 @@ const http = require('http')
 const Redismq = require('./queque')
 
 // Service parameters
-const host = '127.0.0.1'
+const host = 'node'
 const port = '2013'
 
 var queque = new Redismq.Queque()
@@ -50,10 +50,12 @@ var esb = http.createServer(function (req, res) {
   // parses to JSON the url request
   var msg = JSON.stringify(req.url)
   // add it to queque
-  if (queque.ADD(msg)) {
+  if (!queque.ADD(msg)) {
     res.writeHead(200, { 'Content-Type': 'text/json' })
+    res.write(msg)
   } else {
     res.writeHead(404, { 'Content-Type': 'text/json' })
+    res.write('{ERROR: "REDIS down"}')
   }
   res.end()
 })
