@@ -42,7 +42,7 @@ const Redismq = require('./queque')
 
 // Service parameters
 const host = '0.0.0.0'
-const port = '2013'
+const port = '80'
 
 var queque = new Redismq.Queque()
 
