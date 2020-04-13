@@ -41,7 +41,7 @@ const http = require('http')
 const Redismq = require('./queque')
 
 // Service parameters
-const host = 'node'
+const host = '0.0.0.0'
 const port = '2013'
 
 var queque = new Redismq.Queque()
