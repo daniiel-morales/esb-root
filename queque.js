@@ -39,6 +39,7 @@ exports.Queque = Queque
 // Modules required
 const http = require('http')
 const Redismq = require('./queque')
+const url = require('url')
 
 // Service parameters
 const host = '0.0.0.0'
@@ -48,7 +49,7 @@ var queque = new Redismq.Queque()
 
 var esb = http.createServer(function (req, res) {
   // parses to JSON the url request
-  var msg = JSON.stringify(req.url)
+  var msg = JSON.stringify(url.parse(req.url, true).query)
   // add it to queque
   if (!queque.ADD(msg)) {
     res.writeHead(200, { 'Content-Type': 'text/json' })
