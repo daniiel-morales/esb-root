@@ -3,7 +3,7 @@ module.exports = {
   redis: {
     driver: 'redis',
     options: {
-      host: 'redis',
+      host: 'localhost',
       port: 6379
     }
   },
