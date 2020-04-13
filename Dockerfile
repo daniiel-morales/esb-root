@@ -10,7 +10,6 @@ RUN apk update &&\
     apk add redis --no-cache &&\
     npm install
 
-EXPOSE 2013
-
+EXPOSE 80
 
 CMD /usr/bin/redis-server --daemonize yes; node esb
