@@ -39,7 +39,6 @@ exports.Queque = Queque
 // Modules required
 const http = require('http')
 const Redismq = require('./queque')
-const url = require('url')
 
 // Service parameters
 const host = '0.0.0.0'
@@ -49,16 +48,29 @@ var queque = new Redismq.Queque()
 
 var esb = http.createServer(function (req, res) {
   // parses to JSON the url request
-  var msg = JSON.stringify(url.parse(req.url, true).query)
-  // add it to queque
-  if (!queque.ADD(msg)) {
-    res.writeHead(200, { 'Content-Type': 'text/json' })
-    res.write(msg)
+  if (req.method == 'POST') {
+    var msg = ''
+    req.on('data', function(data) {
+      msg = JSON.stringify(JSON.parse(data))
+      
+      // add it to queque
+      if (!queque.ADD(msg)) {
+        res.writeHead(200, { 'Content-Type': 'text/html' })
+        res.write('Post Exitoso data:' + msg)
+      } else {
+        res.writeHead(404, { 'Content-Type': 'text/html' })
+        res.write('ERROR>> REDIS down')
+      }
+    })
+    req.on('end', function() {
+      res.end()
+    })
   } else {
-    res.writeHead(404, { 'Content-Type': 'text/json' })
-    res.write('{ERROR: "REDIS down"}')
+    // GET
+    res.writeHead(200, {'Content-Type': 'text/html'})
+    res.write('me hiciste un GET')
+    res.end()
   }
-  res.end()
 })
 
 // the esb listens for save requests
