@@ -70,4 +70,7 @@ var esb = http.createServer(function (req, res) {
 
 })
 
+// the esb listens for save requests
+esb.listen(port, host)
+
 console.log('ESB>> started')
