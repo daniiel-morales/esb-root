@@ -17,7 +17,7 @@ var esb = http.createServer(function (req, res) {
   // parse REST request
   // req.url -- For who is the message?
   // req.method -- What do you want me to do?
-  // msg.token -- Need it for access
+  // msg.jwt -- Need it for access
   // msg.* -- Parameters need it for operate the request
 
   var msg = ''
@@ -25,9 +25,17 @@ var esb = http.createServer(function (req, res) {
     msg = JSON.stringify(JSON.parse(data))
   })
 
+  var xhttp = new XMLHttpRequest();
+
   if (req.method == 'GET') {
     switch(req.urltoLowerCase()){
       case '/vehiculo':
+          if(jwt !== undefined){
+
+          }else{
+            res.writeHead(403, { 'Content-Type': 'application/json' })
+            res.write('{err:\'El JWT no es válido o no contiene el scope de este servicio\'}')
+          }
         break;
       case '/foto':
         break;
