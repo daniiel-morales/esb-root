@@ -6,4 +6,6 @@ WORKDIR /usr/src/esb
 
 COPY . /usr/src/esb
 
+RUN npm install
+
 CMD npm start
