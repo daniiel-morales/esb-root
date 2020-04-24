@@ -33,28 +33,19 @@ var esb = http.createServer(function (req, res) {
     req_url = req.url.substring(1,req.url.length).toLowerCase()
 
   getParameters(req, msg=> {
-    // verify token scope
+    // verify token and scope access
     if(msg.jwt !== undefined){
       switch(req_url){
         case 'vehiculo':
         case 'foto':
         case 'estado':
-          public_key = '-----BEGIN PUBLIC KEY-----'
-                        + 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANlQt7nPbeMBOZhL3i5C2b876vwXYlkh'
-                        + 'Fm7N6ajoHMc8zHUNSiqg3KFZo7Ywd70jRtgn5TPZqXO5qtmSQ8LsDO8CAwEAAQ=='
-                        + '-----END PUBLIC KEY-----'//process.env.KEY_INVENTARIO
+          public_key = process.env.KEY_INVENTARIO
           break;
         case 'afiliado':
-          public_key = '-----BEGIN PUBLIC KEY-----'
-                        + 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANH6lGLWVF9+Sj9HENNUu0n56uTQidbz'
-                        + 'nCOJiGuj+GfzGJuAE6j7NODbitnk7v/r3GLYidcwB/gI3u4wuWEdwoMCAwEAAQ=='
-                        + '-----END PUBLIC KEY-----'//process.env.KEY_OFICINA
+          public_key = process.env.KEY_OFICINA
           break;
         case 'pago':
-          public_key = '-----BEGIN PUBLIC KEY-----'
-                        + 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMzjyQO8QU94G3Q3kmsz2j6bY+kjpTi9'
-                        + 'kZMxusk1Jch1qvBSkd2e5beFGKpvck5C/TbokfQJJu5HIaDZkOsyOL0CAwEAAQ=='
-                        + '-----END PUBLIC KEY-----'//process.env.KEY_SUBASTA
+          public_key = process.env.KEY_SUBASTA
           break;
         default:
           res.writeHead(404, { 'Content-Type': 'application/json' })
@@ -62,7 +53,7 @@ var esb = http.createServer(function (req, res) {
       }
 
       let opts = {
-        algorithms: ["RS256"]
+        algorithms: ['RS256']
       }
 
       jwt.verify(msg.jwt, public_key, opts, function(err, decoded) {
@@ -71,20 +62,56 @@ var esb = http.createServer(function (req, res) {
           res.write(JSON.stringify({err:'El JWT no es válido o no contiene el scope de este servicio'}))
           res.end()
         }else{
-          //console.log(decoded)
+          const scope = JSON.parse(decoded.scope)
+          let access = ''
           var xhr = new XMLHttpRequest();
 
           if (req.method == 'GET') {
             switch(req_url){
               case 'vehiculo':
+                access = scope.find(element => element.toLowerCase() == 'vehiculo.get')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'vehiculo.get FORBIDDEN'}))
+                }
                 break;
               case 'foto':
+                access = scope.find(element => element.toLowerCase() == 'foto.get')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'foto.get FORBIDDEN'}))
+                }
                 break;
               case 'estado':
+                access = scope.find(element => element.toLowerCase() == 'estado.get')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'estado.get FORBIDDEN'}))
+                }
                 break;
               case 'afiliado':
+                access = scope.find(element => element.toLowerCase() == 'afiliado.get')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'afiliado.get FORBIDDEN'}))
+                }
                 break;
               case 'pago':
+                access = scope.find(element => element.toLowerCase() == 'pago.get')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'pago.get FORBIDDEN'}))
+                }
                 break;
               default:
                 res.writeHead(404, { 'Content-Type': 'application/json' })
@@ -94,8 +121,22 @@ var esb = http.createServer(function (req, res) {
           }else if (req.method == 'POST') {
             switch(req_url){
               case 'afiliado':
+                access = scope.find(element => element.toLowerCase() == 'afiliado.post')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'afiliado.post FORBIDDEN'}))
+                }
                 break;
               case 'pago':
+                access = scope.find(element => element.toLowerCase() == 'pago.post')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'pago.post FORBIDDEN'}))
+                }
                 break;
               default:
                 res.writeHead(404, { 'Content-Type': 'application/json' })
@@ -105,8 +146,22 @@ var esb = http.createServer(function (req, res) {
             // PUT request
             switch(req_url){
               case 'vehiculo':
+                access = scope.find(element => element.toLowerCase() == 'vehiculo.put')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'vehiculo.put FORBIDDEN'}))
+                }
                 break;
               case 'afiliado':
+                access = scope.find(element => element.toLowerCase() == 'afiliado.put')
+                if(access != undefined){
+                  // REQUEST API here
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json' })
+                  res.write(JSON.stringify({err:'afiliado.put FORBIDDEN'}))
+                }
                 break;
               default:
                 res.writeHead(404, { 'Content-Type': 'application/json' })
@@ -129,7 +184,7 @@ var esb = http.createServer(function (req, res) {
 // the esb listens for save requests
 esb.listen(port, host)
 
-console.log('ESB>> started ' + host + ':' + port )
+console.log('ESB>> started')
 
 function getParameters(request, callback){
   // extracts parameters
