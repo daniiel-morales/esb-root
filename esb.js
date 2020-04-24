@@ -23,26 +23,18 @@ var esb = http.createServer(function (req, res) {
   // msg.jwt -- Need it for access
   // msg.* -- Parameters need it for operate the request
 
-
-  let msg = ''
-  var parameters_index = req.url.length
   let public_key = ''
 
-  // extracts parameters
-  if(req.method == 'GET'){
-    msg = url.parse(req.url, true).query
-    parameters_index = req.url.lastIndexOf('?')
-  }else
-    req.on('data', chunk => {
-        msg = parse(chunk.toString())
-    })
+  // delete parameters of url and the first backslash
+  var req_url = ''
+  if(req.method == 'GET')
+    req_url = req.url.substring(1,req.url.lastIndexOf('?')).toLowerCase()
+  else
+    req_url = req.url.substring(1,req.url.length).toLowerCase()
 
-  req.on('end', function() {
-    // delete parameters of url and the first backslash
-    var req_url = req.url.substring(1,parameters_index).toLowerCase()
-
+  getParameters(req, msg=> {
     // verify token scope
-    if(jwt !== undefined){
+    if(msg.jwt !== undefined){
       switch(req_url){
         case 'vehiculo':
         case 'foto':
@@ -67,69 +59,84 @@ var esb = http.createServer(function (req, res) {
         default:
           res.writeHead(404, { 'Content-Type': 'application/json' })
           res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
-          res.end()
       }
 
-      jwt.verify(msg.jwt, public_key, function(err, decoded) {
+      let opts = {
+        algorithms: ["RS256"]
+      }
+
+      jwt.verify(msg.jwt, public_key, opts, function(err, decoded) {
         if (err) {
           res.writeHead(403, { 'Content-Type': 'application/json' })
           res.write(JSON.stringify({err:'El JWT no es válido o no contiene el scope de este servicio'}))
           res.end()
+        }else{
+          //console.log(decoded)
+          var xhr = new XMLHttpRequest();
+
+          if (req.method == 'GET') {
+            switch(req_url){
+              case 'vehiculo':
+                break;
+              case 'foto':
+                break;
+              case 'estado':
+                break;
+              case 'afiliado':
+                break;
+              case 'pago':
+                break;
+              default:
+                res.writeHead(404, { 'Content-Type': 'application/json' })
+                res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
+            }
+            res.end()
+          }else if (req.method == 'POST') {
+            switch(req_url){
+              case 'afiliado':
+                break;
+              case 'pago':
+                break;
+              default:
+                res.writeHead(404, { 'Content-Type': 'application/json' })
+                res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
+            }
+          } else {
+            // PUT request
+            switch(req_url){
+              case 'vehiculo':
+                break;
+              case 'afiliado':
+                break;
+              default:
+                res.writeHead(404, { 'Content-Type': 'application/json' })
+                res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
+            }
+          }
         }
-        console.log(JSON.stringify(decoded))
       })
     }else{
       res.writeHead(403, { 'Content-Type': 'application/json' })
       res.write(JSON.stringify({err:'El JWT no es válido o no contiene el scope de este servicio'}))
-      res.end()
-    }
-
-    var xhr = new XMLHttpRequest();
-
-    if (req.method == 'GET') {
-      switch(req_url){
-        case 'vehiculo':
-          break;
-        case 'foto':
-          break;
-        case 'estado':
-          break;
-        case 'afiliado':
-          break;
-        case 'pago':
-          break;
-        default:
-          res.writeHead(404, { 'Content-Type': 'application/json' })
-          res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
-      }
-    }else if (req.method == 'POST') {
-      switch(req_url){
-        case 'afiliado':
-          break;
-        case 'pago':
-          break;
-        default:
-          res.writeHead(404, { 'Content-Type': 'application/json' })
-          res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
-      }
-    } else {
-      // PUT request
-      switch(req_url){
-        case 'vehiculo':
-          break;
-        case 'afiliado':
-          break;
-        default:
-          res.writeHead(404, { 'Content-Type': 'application/json' })
-          res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
-      }
     }
   })
 
-  res.end()
+  req.on('end', function() {
+    res.end()
+  })
 })
 
 // the esb listens for save requests
 esb.listen(port, host)
 
 console.log('ESB>> started ' + host + ':' + port )
+
+function getParameters(request, callback){
+  // extracts parameters
+  if(request.method == 'GET'){
+    callback(url.parse(request.url, true).query)
+  }else
+    request.on('data', chunk => {
+        callback(parse(chunk.toString()))
+    })
+}
