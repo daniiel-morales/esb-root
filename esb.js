@@ -13,8 +13,8 @@ const jwt = require('jsonwebtoken')
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
 
 // Service parameters
-const host = 'localhost'//process.env.HOST
-const port = 2013//process.env.PORT
+const host = process.env.HOST
+const port = process.env.PORT
 
 var esb = http.createServer(function (req, res) {
   // parse REST request
@@ -24,7 +24,7 @@ var esb = http.createServer(function (req, res) {
   // msg.* -- Parameters need it for operate the request
 
   let public_key = ''
-
+  let API = ''
   // delete parameters of url and the first backslash
   var req_url = ''
   if(req.method == 'GET')
@@ -39,26 +39,14 @@ var esb = http.createServer(function (req, res) {
         case 'vehiculo':
         case 'foto':
         case 'estado':
-          public_key = '-----BEGIN PUBLIC KEY-----\n'
-                        + 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANlQt7nPbeMBOZhL3i5C2b876vwXYlkh\n'
-                        + 'Fm7N6ajoHMc8zHUNSiqg3KFZo7Ywd70jRtgn5TPZqXO5qtmSQ8LsDO8CAwEAAQ==\n'
-                        + '-----END PUBLIC KEY-----\n'//process.env.KEY_INVENTARIO
-          break;
         case 'afiliado':
-          public_key = '-----BEGIN PUBLIC KEY-----\n'
-                        + 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANH6lGLWVF9+Sj9HENNUu0n56uTQidbz\n'
-                        + 'nCOJiGuj+GfzGJuAE6j7NODbitnk7v/r3GLYidcwB/gI3u4wuWEdwoMCAwEAAQ==\n'
-                        + '-----END PUBLIC KEY-----\n'//process.env.KEY_OFICINA
-          break;
         case 'pago':
-          public_key = '-----BEGIN PUBLIC KEY-----\n'
-                        + 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMzjyQO8QU94G3Q3kmsz2j6bY+kjpTi9\n'
-                        + 'kZMxusk1Jch1qvBSkd2e5beFGKpvck5C/TbokfQJJu5HIaDZkOsyOL0CAwEAAQ==\n'
-                        + '-----END PUBLIC KEY-----\n'//process.env.KEY_SUBASTA
+          public_key = process.env.PUBLIC_KEY
           break;
         default:
           res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
           res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
+          res.end()
       }
 
       let opts = {
@@ -78,79 +66,18 @@ var esb = http.createServer(function (req, res) {
           if (req.method == 'GET') {
             switch(req_url){
               case 'vehiculo':
-                access = scope.find(element => element.toLowerCase() == 'vehiculo.get')
-                if(access != undefined){
-                  // REQUEST API here
-                  callAPI(xhr,req.url,msg,req.method, response=>{
-                    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
-                    res.write(response)
-                    res.end()
-                  })
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'vehiculo.get FORBIDDEN'}))
-                  res.end()
-                }
-                break;
               case 'foto':
-                access = scope.find(element => element.toLowerCase() == 'foto.get')
-                if(access != undefined){
-                  // REQUEST API here
-                  callAPI(xhr,req.url,msg,req.method, response=>{
-                    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
-                    res.write(response)
-                    res.end()
-                  })
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'foto.get FORBIDDEN'}))
-                  res.end()
-                }
-                break;
               case 'estado':
-                access = scope.find(element => element.toLowerCase() == 'estado.get')
-                if(access != undefined){
-                  // REQUEST API here
-                  callAPI(xhr,req.url,msg,req.method, response=>{
-                    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
-                    res.write(response)
-                    res.end()
-                  })
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'estado.get FORBIDDEN'}))
-                  res.end()
-                }
+                // URL INVENTARIO
+                API = process.env.URL_INVENTARIO
                 break;
               case 'afiliado':
-                access = scope.find(element => element.toLowerCase() == 'afiliado.get')
-                if(access != undefined){
-                  // REQUEST API here
-                  callAPI(xhr,req.url,msg,req.method, response=>{
-                    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
-                    res.write(response)
-                    res.end()
-                  })
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'afiliado.get FORBIDDEN'}))
-                  res.end()
-                }
+                // URL OFICINA
+                API = process.env.URL_OFICINA
                 break;
               case 'pago':
-                access = scope.find(element => element.toLowerCase() == 'pago.get')
-                if(access != undefined){
-                  // REQUEST API here
-                  callAPI(xhr,req.url,msg,req.method, response=>{
-                    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
-                    res.write(response)
-                    res.end()
-                  })
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'pago.get FORBIDDEN'}))
-                  res.end()
-                }
+                // URL SUBASTA
+                API = process.env.URL_SUBASTA
                 break;
               default:
                 res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
@@ -160,24 +87,9 @@ var esb = http.createServer(function (req, res) {
           }else if (req.method == 'POST') {
             switch(req_url){
               case 'afiliado':
-                access = scope.find(element => element.toLowerCase() == 'afiliado.post')
-                if(access != undefined){
-                  // REQUEST API here
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'afiliado.post FORBIDDEN'}))
-                  res.end()
-                }
-                break;
               case 'pago':
-                access = scope.find(element => element.toLowerCase() == 'pago.post')
-                if(access != undefined){
-                  // REQUEST API here
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'pago.post FORBIDDEN'}))
-                  res.end()
-                }
+                // URL OFICINA
+                API = process.env.URL_OFICINA
                 break;
               default:
                 res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
@@ -188,30 +100,31 @@ var esb = http.createServer(function (req, res) {
             // PUT request
             switch(req_url){
               case 'vehiculo':
-                access = scope.find(element => element.toLowerCase() == 'vehiculo.put')
-                if(access != undefined){
-                  // REQUEST API here
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'vehiculo.put FORBIDDEN'}))
-                  res.end()
-                }
+                // URL INVENTARIO
+                API = process.env.URL_INVENTARIO
                 break;
               case 'afiliado':
-                access = scope.find(element => element.toLowerCase() == 'afiliado.put')
-                if(access != undefined){
-                  // REQUEST API here
-                }else{
-                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                  res.write(JSON.stringify({err:'afiliado.put FORBIDDEN'}))
-                  res.end()
-                }
+                // URL OFICINA 
+                API = process.env.URL_OFICINA
                 break;
               default:
                 res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
                 res.write(JSON.stringify({err:'Resource ' + req.url + '.' + req.method + ' Not Found 404'}))
                 res.end()
             }
+          }
+          access = scope.find(element => element.toLowerCase() == req_url + '.' + req.method.toLocaleLowerCase())
+          if(access != undefined){
+            // REQUEST API here
+            callAPI(API, xhr, req.url, msg, req.method, response=>{
+              res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
+              res.write(response)
+              res.end()
+            })
+          }else{
+            res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+            res.write(JSON.stringify({err:'estado.get FORBIDDEN'}))
+            res.end()
           }
         }
       })
@@ -238,8 +151,8 @@ function getParameters(request, callback){
     })
 }
 
-function callAPI(request, url, params, method, callback){
-  request.open(method,'https://proyectosa-aemymiaoda-uc.a.run.app'+url, true)
+function callAPI(API, request, url, params, method, callback){
+  request.open(method,API+url, true)
 
   request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
   request.setRequestHeader('Access-Control-Allow-Origin', '*')
