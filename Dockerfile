@@ -6,10 +6,6 @@ WORKDIR /usr/src/esb
 
 COPY . /usr/src/esb
 
-RUN apk update &&\
-    apk add redis --no-cache &&\
-    npm install
+RUN npm install
 
-EXPOSE 80
-
-CMD /usr/bin/redis-server --daemonize yes; node esb
+CMD npm start
