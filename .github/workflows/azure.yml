@@ -18,6 +18,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
+    - name: 'Build and push image'
     - uses: azure/docker-login@v1
       with:
         login-server: daniimor.azurecr.io
@@ -28,10 +29,30 @@ jobs:
         docker build . -t daniimor.azurecr.io/esb:${{ github.sha }}
         docker push daniimor.azurecr.io/esb:${{ github.sha }} 
       
-    - uses: azure/webapps-container-deploy@v1
-      with:
-        app-name: 'esb'
-        images: 'daniimor.azurecr.io/esb:${{ github.sha }}'
+    - name: 'Deploy to Azure Container Instances'
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+          image: daniimor.azurecr.io/esb:${{ github.sha }}
+          registry-login-server: daniimor.azurecr.io
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: esb
+          location: 'west us'
+          environmentVariables:
+          - name: 'HOST'
+            value: 0.0.0.0
+          - name: 'PORT'
+            value: 80
+          - name: 'PUBLIC_KEY'
+            secureValue: ${{ secrets.PUBLIC_KEY }}
+          - name: 'URL_INVENTARIO'
+            secureValue: ${{ secrets.URL_INVENTARIO }}
+          - name: 'URL_OFICINA'
+            secureValue: ${{ secrets.URL_OFICINA }}
+          - name: 'URL_SUBASTA'
+            secureValue: ${{ secrets.URL_SUBASTA }}
     
     - name: Azure logout
       run: |
