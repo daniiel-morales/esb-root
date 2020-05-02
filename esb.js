@@ -60,7 +60,7 @@ var esb = http.createServer(function (req, res) {
               const scope = JSON.parse(decoded.scope)
               let access = ''
               var xhr = new XMLHttpRequest();
-    
+              let exists = true
               if (req.method == 'GET') {
                 switch(req_url){
                   case 'vehiculo':
@@ -78,9 +78,7 @@ var esb = http.createServer(function (req, res) {
                     API = process.env.URL_SUBASTA
                     break;
                   default:
-                    res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                    res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
-                    res.end()
+                    exists = false
                 }
               }else if (req.method == 'POST') {
                 switch(req_url){
@@ -90,9 +88,7 @@ var esb = http.createServer(function (req, res) {
                     API = process.env.URL_OFICINA
                     break;
                   default:
-                    res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                    res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
-                    res.end()
+                    exists = false
                 }
               } else {
                 // PUT request
@@ -106,22 +102,26 @@ var esb = http.createServer(function (req, res) {
                     API = process.env.URL_OFICINA
                     break;
                   default:
-                    res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                    res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
-                    res.end()
+                    exists = false
                 }
               }
-              access = scope.find(element => element.toLowerCase() == req_url + '.' + req.method.toLowerCase())
-              if(access != undefined){
-                // REQUEST API here
-                callAPI(API, xhr, req.url, msg, req.method, response=>{
-                  res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
-                  res.write(response)
+              if(exists){
+                access = scope.find(element => element.toLowerCase() == req_url + '.' + req.method.toLowerCase())
+                if(access != undefined){
+                  // REQUEST API here
+                  callAPI(API, xhr, req.url, msg, req.method, response=>{
+                    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
+                    res.write(response)
+                    res.end()
+                  })
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+                  res.write(JSON.stringify({err:req_url + '.' + req.method.toLowerCase() + ' FORBIDDEN'}))
                   res.end()
-                })
+                }
               }else{
-                res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                res.write(JSON.stringify({err:req_url + '.' + req.method.toLowerCase() + ' FORBIDDEN'}))
+                res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+                res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
                 res.end()
               }
             }
