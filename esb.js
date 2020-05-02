@@ -22,7 +22,7 @@ var esb = http.createServer(function (req, res) {
   // req.method -- What do you want me to do?
   // msg.jwt -- Need it for access
   // msg.* -- Parameters need it for operate the request
-
+  let body = ''
   let public_key = ''
   let API = ''
   // delete parameters of url and the first backslash
@@ -33,6 +33,8 @@ var esb = http.createServer(function (req, res) {
     req_url = req.url.substring(1,req.url.length).toLowerCase()
 
   getParameters(req, msg=> {
+    body = msg
+    msg = parse(body)
     // verify token and scope access
     if(msg.jwt !== undefined){
       switch(req_url){
@@ -60,7 +62,7 @@ var esb = http.createServer(function (req, res) {
               const scope = JSON.parse(decoded.scope)
               let access = ''
               var xhr = new XMLHttpRequest();
-    
+              let exists = true
               if (req.method == 'GET') {
                 switch(req_url){
                   case 'vehiculo':
@@ -78,9 +80,7 @@ var esb = http.createServer(function (req, res) {
                     API = process.env.URL_SUBASTA
                     break;
                   default:
-                    res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                    res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
-                    res.end()
+                    exists = false
                 }
               }else if (req.method == 'POST') {
                 switch(req_url){
@@ -90,9 +90,7 @@ var esb = http.createServer(function (req, res) {
                     API = process.env.URL_OFICINA
                     break;
                   default:
-                    res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                    res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
-                    res.end()
+                    exists = false
                 }
               } else {
                 // PUT request
@@ -106,22 +104,26 @@ var esb = http.createServer(function (req, res) {
                     API = process.env.URL_OFICINA
                     break;
                   default:
-                    res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                    res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
-                    res.end()
+                    exists = false
                 }
               }
-              access = scope.find(element => element.toLowerCase() == req_url + '.' + req.method.toLowerCase())
-              if(access != undefined){
-                // REQUEST API here
-                callAPI(API, xhr, req.url, msg, req.method, response=>{
-                  res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
-                  res.write(response)
+              if(exists){
+                access = scope.find(element => element.toLowerCase() == req_url + '.' + req.method.toLowerCase())
+                if(access != undefined){
+                  // REQUEST API here
+                  callAPI(API, xhr, req.url, body, req.method, response=>{
+                    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
+                    res.write(response)
+                    res.end()
+                  })
+                }else{
+                  res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+                  res.write(JSON.stringify({err:req_url + '.' + req.method.toLowerCase() + ' FORBIDDEN'}))
                   res.end()
-                })
+                }
               }else{
-                res.writeHead(403, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-                res.write(JSON.stringify({err:req_url + '.' + req.method.toLowerCase() + ' FORBIDDEN'}))
+                res.writeHead(404, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+                res.write(JSON.stringify({err:'Resource ' + req_url + '.' + req.method.toLowerCase() + ' Not Found 404'}))
                 res.end()
               }
             }
@@ -151,7 +153,7 @@ function getParameters(request, callback){
     callback(url.parse(request.url, true).query)
   }else
     request.on('data', chunk => {
-        callback(parse(chunk.toString()))
+        callback(chunk.toString())
     })
 }
 
