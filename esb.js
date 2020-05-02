@@ -13,8 +13,8 @@ const jwt = require('jsonwebtoken')
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest
 
 // Service parameters
-const host = process.env.HOST
-const port = process.env.PORT
+const host = '0.0.0.0' //process.env.HOST
+const port = 80//process.env.PORT
 
 var esb = http.createServer(function (req, res) {
   // parse REST request
@@ -47,7 +47,7 @@ var esb = http.createServer(function (req, res) {
         case 'afiliado':
         case 'pago':
           public_key = '-----BEGIN PUBLIC KEY-----\n'
-                      + process.env.PUBLIC_KEY
+                      + 'MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAOp7P/J9U+6VN+BQDcIWyzvMPVnqmRz5~z6HNUfcDOsSEk2egtxuBBgAF75OlLxMXi/KyNlb5sNy5qIxrTEv8IYMCAwEAAQ=='//process.env.PUBLIC_KEY
                       + '\n-----END PUBLIC KEY-----'
 
           public_key = public_key.split('~').join('\n')
@@ -72,15 +72,15 @@ var esb = http.createServer(function (req, res) {
                   case 'foto':
                   case 'estado':
                     // URL INVENTARIO
-                    API = process.env.URL_INVENTARIO
+                    API = 'https://proyectosa-aemymiaoda-uc.a.run.app'//process.env.URL_INVENTARIO
                     break;
                   case 'afiliado':
                     // URL OFICINA
-                    API = process.env.URL_OFICINA
+                    API = 'https://proyectosaoficina-aemymiaoda-uc.a.run.app'//process.env.URL_OFICINA
                     break;
                   case 'pago':
                     // URL SUBASTA
-                    API = process.env.URL_SUBASTA
+                    API = 'http://subasta-online.eastus.azurecontainer.io'//process.env.URL_SUBASTA
                     break;
                   default:
                     exists = false
@@ -90,7 +90,7 @@ var esb = http.createServer(function (req, res) {
                   case 'afiliado':
                   case 'pago':
                     // URL OFICINA
-                    API = process.env.URL_OFICINA
+                    API = 'https://proyectosaoficina-aemymiaoda-uc.a.run.app'//process.env.URL_OFICINA
                     break;
                   default:
                     exists = false
@@ -100,11 +100,11 @@ var esb = http.createServer(function (req, res) {
                 switch(req_url){
                   case 'vehiculo':
                     // URL INVENTARIO
-                    API = process.env.URL_INVENTARIO
+                    API = 'https://proyectosa-aemymiaoda-uc.a.run.app'//process.env.URL_INVENTARIO
                     break;
                   case 'afiliado':
                     // URL OFICINA 
-                    API = process.env.URL_OFICINA
+                    API = 'https://proyectosaoficina-aemymiaoda-uc.a.run.app'//process.env.URL_OFICINA
                     break;
                   default:
                     exists = false
