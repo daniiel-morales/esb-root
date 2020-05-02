@@ -33,8 +33,11 @@ var esb = http.createServer(function (req, res) {
     req_url = req.url.substring(1,req.url.length).toLowerCase()
 
   getParameters(req, msg=> {
-    body = msg
-    msg = parse(body)
+    
+    if(req.method !== 'GET'){
+      body = msg
+      msg = parse(msg)
+    }
     // verify token and scope access
     if(msg.jwt !== undefined){
       switch(req_url){
