@@ -28,17 +28,17 @@ jobs:
         docker build . -t daniimor.azurecr.io/esb:${{ github.sha }}
         docker push daniimor.azurecr.io/esb:${{ github.sha }} 
 
-    #- name: 'Deploy to Azure Container Instances'
-    #- uses: 'azure/aci-deploy@v1'
-    #  with:
-    #    resource-group: ${{ secrets.RESOURCE_GROUP }}
-    #    dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-    #    image: daniimor.azurecr.io/esb:${{ github.sha }}
-    #    registry-login-server: daniimor.azurecr.io
-    #    registry-username: ${{ secrets.REGISTRY_USERNAME }}
-    #    registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-    #    name: esb
-    #    location: 'west us'
+    - name: 'Deploy to Azure Container Instances'
+    - uses: 'azure/aci-deploy@v1'
+      with:
+        resource-group: ${{ secrets.RESOURCE_GROUP }}
+        dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+        image: daniimor.azurecr.io/esb:${{ github.sha }}
+        registry-login-server: daniimor.azurecr.io
+        registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        name: esb
+        location: 'west us'
 
     - name: Azure logout
       run: |
