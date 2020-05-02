@@ -18,7 +18,6 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: 'Build and push image'
     - uses: azure/docker-login@v1
       with:
         login-server: daniimor.azurecr.io
@@ -28,7 +27,7 @@ jobs:
     - run: |
         docker build . -t daniimor.azurecr.io/esb:${{ github.sha }}
         docker push daniimor.azurecr.io/esb:${{ github.sha }} 
-      
+
     #- name: 'Deploy to Azure Container Instances'
     #- uses: 'azure/aci-deploy@v1'
     #  with:
