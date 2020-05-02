@@ -22,7 +22,7 @@ var esb = http.createServer(function (req, res) {
   // req.method -- What do you want me to do?
   // msg.jwt -- Need it for access
   // msg.* -- Parameters need it for operate the request
-
+  let body = ''
   let public_key = ''
   let API = ''
   // delete parameters of url and the first backslash
@@ -33,6 +33,8 @@ var esb = http.createServer(function (req, res) {
     req_url = req.url.substring(1,req.url.length).toLowerCase()
 
   getParameters(req, msg=> {
+    body = msg
+    msg = parse(body)
     // verify token and scope access
     if(msg.jwt !== undefined){
       switch(req_url){
@@ -109,7 +111,7 @@ var esb = http.createServer(function (req, res) {
                 access = scope.find(element => element.toLowerCase() == req_url + '.' + req.method.toLowerCase())
                 if(access != undefined){
                   // REQUEST API here
-                  callAPI(API, xhr, req.url, msg, req.method, response=>{
+                  callAPI(API, xhr, req.url, body, req.method, response=>{
                     res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'})
                     res.write(response)
                     res.end()
@@ -151,7 +153,7 @@ function getParameters(request, callback){
     callback(url.parse(request.url, true).query)
   }else
     request.on('data', chunk => {
-        callback(parse(chunk.toString()))
+        callback(chunk.toString())
     })
 }
 
